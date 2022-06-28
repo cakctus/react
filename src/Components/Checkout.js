@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import {loadStripe} from '@stripe/stripe-js';
+import '@stripe/stripe-js';
 // JS
 // const input = document.getElementById('myText');
 // const inputValue = input.value
 // React
 // value, onChange
 // dynamic object keys
+
+let stripePromise;
+
+const getStripe = () => {
+  if (!stripePromise) {
+    stripePromise = loadStripe('pk_test_doDtTbwo4WXrCIyg96hxC1CY00Fz4WDfRv');
+  }
+  return stripePromise;
+};
 
 const Checkout = () => {
   const [checkout, setCheckout] = useState({ street: '', appartment: '', zip: '', payment: ['Stripe', 'Paypal']})
@@ -14,6 +25,25 @@ const Checkout = () => {
   const [payment, setPayment] = useState(['Stripe', 'Paypal'])
   const [pay, setPay] = useState('')
   const [check, setCheck] = useState([]);
+
+  const item = {
+    price: 'price_1LFepNApbL7rbNPPrwmIJRhp',
+    quantity: 1
+  };
+
+  const checkoutOptions = {
+    lineItems: [item],
+    mode: "payment",
+    successUrl: `${window.location.origin}/success`,
+    cancelUrl: `${window.location.origin}/cancel`
+  };
+
+  const redirectToCheckout = async () => {
+    console.log("redirectToCheckout");
+    const stripe = await getStripe();
+    const { error } = await stripe.redirectToCheckout(checkoutOptions);
+    console.log("Stripe checkout error", error);
+  };
 
 
   const handleChange = (e) => {
@@ -135,7 +165,7 @@ const Checkout = () => {
          </div>
           
           
-          <button type='submit'>send</button>
+          <button type='submit' onClick={redirectToCheckout}>send</button>
         </form>
 
         {obj.street} <br />

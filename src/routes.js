@@ -48,7 +48,6 @@ function BaseRouter()  {
                 <Route path='/about' element={<About/>}/>   
                 <Route path="*" element={<NotFound />} />
                 <Route path="/create" element={<Create />} />
-                <Route path="/element" element={<Element />} />
                 <Route path="/order" element={
                     <ProtectedRoute isAuth={isAuth}>
                         <Order isAuth={isAuth} />

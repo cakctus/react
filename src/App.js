@@ -4,9 +4,10 @@ import {BrowserRouter} from 'react-router-dom'
 import BaseRouter from './routes';
 import  Context  from './Context/context';
 import {loadStripe} from '@stripe/stripe-js';
+import '@stripe/stripe-js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-const stripePromise = loadStripe('pk_test_doDtTbwo4WXrCIyg96hxC1CY00Fz4WDfRv');
+const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_KEY);
 
 function App(props) {
   const [isAuth, setIsAuth] = React.useState(() => {
