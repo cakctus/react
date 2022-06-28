@@ -3,7 +3,6 @@ import './App.css';
 import {BrowserRouter} from 'react-router-dom'
 import BaseRouter from './routes';
 import  Context  from './Context/context';
-import {Elements} from '@stripe/react-stripe-js';
 import {loadStripe} from '@stripe/stripe-js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
