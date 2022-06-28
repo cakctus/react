@@ -13,7 +13,7 @@ let stripePromise;
 
 const getStripe = () => {
   if (!stripePromise) {
-    stripePromise = loadStripe('pk_test_doDtTbwo4WXrCIyg96hxC1CY00Fz4WDfRv');
+    stripePromise = loadStripe('');
   }
   return stripePromise;
 };
@@ -27,7 +27,7 @@ const Checkout = () => {
   const [check, setCheck] = useState([]);
 
   const item = {
-    price: 'price_1LFepNApbL7rbNPPrwmIJRhp',
+    price: '',
     quantity: 1
   };
 
