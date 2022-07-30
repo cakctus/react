@@ -1,8 +1,8 @@
 import React from "react";
 import {useParams} from 'react-router-dom'
 import axios from "axios";
-import UpdateForm from "./UpdateAPI";
-import FormAPI from "./FormAPI";
+import UpdateForm from "../UpdateAPI";
+import FormAPI from "../FormAPI";
 
 
 function PostId() {
