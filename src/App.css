@@ -2,6 +2,10 @@ body {
   background-color: #202124;
 }
 
+#body {
+  background-color: #202124;
+}
+
 .main {
   width: 100%;
   max-width: 1200px;
@@ -60,8 +64,8 @@ body {
 
 .done {
   text-decoration: line-through;
+  background-color: red;
 }
-
 
 @media (prefers-reduced-motion: no-preference) {
   .App-logo {
@@ -178,7 +182,8 @@ body {
   }
 }
 
-table, tr, td {
+table,
+tr,
+td {
   border: 1px solid silver;
 }
-

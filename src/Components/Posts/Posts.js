@@ -1,29 +1,34 @@
 import React, { useEffect, useReducer } from "react"
 import axios from "axios"
-import { createStore } from "redux"
-import { Provider } from "react-redux"
 
 import PostList from "./PostList"
-import Loader from "../Loader"
-import Loader2 from "../Loader"
-import Modal from "../Modal"
-import Form from "../Form"
-import FormAPI from "../FormAPI"
-import ModalMessage from "../ModalMessage"
+import Loader from "../Loaders/Loader"
+import Loader2 from "../Loaders/Loader"
+import Select from "../Sort/Select"
 
 const defaultState = {
   posts: [],
   loading: true,
   loading2: false,
+  selectedSort: "",
 }
 
 function reducer(state, action) {
   switch (action.type) {
-    case "set":
+    case "SET":
       return {
         loading: false,
         loading2: true,
         posts: [...state.posts, ...action.payload],
+      }
+    case "REMOVE":
+      const newState = state.posts.filter((post) => post.id !== action.payload)
+      return {
+        posts: newState,
+      }
+    case "SORT":
+      return {
+        posts: [...state.posts].sort((a, b) => a.title.localeCompare(b.date)),
       }
     default:
       throw new Error()
@@ -33,44 +38,14 @@ function reducer(state, action) {
 function Posts() {
   const [state, dispatch] = useReducer(reducer, defaultState)
 
-  const [loading, setLoading] = React.useState(true)
+  const [post, setPost] = React.useState("")
+
   const [loading2, setLoading2] = React.useState(false)
 
   const [currentPage, setCurrentPage] = React.useState(1)
   const [fetching, setFetching] = React.useState(true)
 
-  const [post, setPost] = React.useState([])
-
-  // const reducer = (state, action) => {
-  //   console.log(state.post)
-  //   if (action.type === "ADD_ITEM") {
-  //     const newItem = [...state.post, action.payload]
-  //     return {
-  //       ...state,
-  //       post: newItem,
-  //       isModalOpen: true,
-  //       modalContent: "added",
-  //     }
-  //   }
-
-  //   if (action.type === "CLOSE_MODAL") {
-  //     return {
-  //       ...state,
-  //       isModalOpen: false,
-  //     }
-  //   }
-  // }
-
-  // const defaultState = {
-  //   post: post,
-  //   isModalOpen: false,
-  //   modalContent: "",
-  // }
-
-  const [title, setTitle] = React.useState("")
-  const [newPost, setNewPost] = React.useState({ title: "" })
-  const [modal, setModal] = React.useState(false)
-  const [totalItem, setTotalItem] = React.useState(0)
+  const [selectedSort, setSeletedSort] = React.useState(" ")
 
   useEffect(() => {
     if (fetching) {
@@ -79,12 +54,11 @@ function Posts() {
         .then(
           (response) => {
             if (response.status === 200) {
-              // setLoading(false)
               setLoading2(true)
-              setTotalItem(response.data.count)
               setCurrentPage((prev) => prev + 1)
+              setPost(response.data.results)
               dispatch({
-                type: "set",
+                type: "SET",
                 payload: [...response.data.results],
               })
             }
@@ -116,97 +90,41 @@ function Posts() {
     }
   }
 
-  function openModal() {
-    setModal(true)
+  // const closeModalDispatch = () => {
+  //   dispatch({ type: "CLOSE_MODAL" })
+  // }
+
+  const sortPost = (sort) => {
+    setSeletedSort(sort)
+    // setPost([...post].sort((a, b) => a[sort].localeCompare(b[sort])))
+    setPost([...post].sort((a, b) => a.title.localeCompare(b.id)))
   }
 
-  function closeModal() {
-    setModal(false)
+  const sort = (value) => {
+    console.log(value)
+    dispatch({ type: "SORT", payload: value })
   }
 
-  const objCreate = (e) => {
-    const name = e.target.name
-    const value = e.target.value
-    setNewPost({ ...newPost, [name]: value })
-  }
-
-  const newPostFunction = (e) => {
-    e.preventDefault()
-
-    if (newPost.title) {
-      const nPost = { ...newPost, id: new Date().getTime().toString() }
-      dispatch({ type: "ADD_ITEM", payload: nPost })
-      //setPost([...post, {...newPost, nPost }])
-    }
-    if (title) {
-      const n = { id: Date.now(), title: title, completed: false }
-      dispatch({ type: "ADD_ITEM", payload: n })
-      //setPost([...post, n])
-    }
-
-    setTitle("")
-    setNewPost({ title: "" })
-  }
-
-  const createPost = (newPost) => {
-    setPost([...post, newPost])
-  }
-
-  const closeModalDispatch = () => {
-    dispatch({ type: "CLOSE_MODAL" })
+  const removePost = (id) => {
+    dispatch({ type: "REMOVE", payload: id })
   }
 
   return (
     <div>
-      <button
-        onClick={openModal}
-        style={{ marginRight: 10, borderRadius: 10, textAlign: "center" }}
-      >
-        Create post
-      </button>
-      {modal && (
-        <Modal setVisible={setModal}>
-          {state.isModalOpen && (
-            <ModalMessage
-              closeModal={closeModalDispatch}
-              modalContent={state.modalContent}
-            />
-          )}
-          <form>
-            <input
-              type="text"
-              value={title}
-              placeholder="title"
-              onChange={(value) => setTitle(value.target.value)}
-            ></input>{" "}
-            <br />
-            <input
-              type="text"
-              value={newPost.title}
-              id="title"
-              name="title"
-              placeholder="from app"
-              onChange={objCreate}
-            ></input>{" "}
-            <br />
-          </form>
-          <button onClick={newPostFunction}>Create</button>
-          <hr />
-          <Form create={createPost} />
-          <hr />
-          <FormAPI requestType="post" btnText="Create" /> <br />
-          <button onClick={closeModal}>Close</button>
-        </Modal>
-      )}
-
+      <Select
+        options={[
+          { value: "title", name: "title" },
+          { value: "id", name: "id" },
+        ]}
+        defaultValue={"Sort by"}
+        value={selectedSort}
+        onChange={sortPost}
+        sort={sort}
+      />
       {state.loading === true ? (
         <Loader />
       ) : (
-        <PostList
-          post={state.posts}
-          // postTogle={postTogle}
-          // remove={removePost}
-        />
+        <PostList post={state.posts} remove={removePost} />
       )}
       {loading2 && <Loader2 />}
     </div>
